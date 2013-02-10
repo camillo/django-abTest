@@ -88,7 +88,7 @@ def subscribedNewsletter(request):
     goal = Goal.objects.get("subscribed newsletter")
     goal.reached(request)
             </pre>
-            For your convenient there is a litter helper <code>goalReached(request, name, commit = True, failSilent=None)</code>.
+            For your convenient there is a little helper <code>goalReached(request, name, commit = True, failSilent=None)</code>.
             <pre>
 from abTest import goalReached
 def subscribedNewsletter(request):
