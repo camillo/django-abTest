@@ -1,0 +1,12 @@
+This is a very flexible AB-Test framework for django.
+
+It handles Tests, with their experiments, goals and results.
+
+Quick start:
+cd example
+./manage.py syncdb
+./manage.py runserver
+
+This should start the project website with docu and live demo.
+
+You may also see it here: http://abtest.h0rde.net
