@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row well">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a href="#goal" data-toggle="tab">Goal</a></li>
+            <li><a href="#experiment" data-toggle="tab">Experiment</a></li>
+            <li><a href="#test" data-toggle="tab">Test</a></li>
+            <li><a href="#testResult" data-toggle="tab">TestResult</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="goal">
+                <p>
+                    A goal is anything you want to reach:
+                    <ul>
+                        <li>sell contract</li>
+                        <li>subscribe newsletter</li>
+                        <li>...</li>
+                    </ul>
+                    For the lib it is just a name, that is used as key for some dictionaries.
+                </p>
+                <p>
+                    To tell the lib, that the goal is reached, use <code>reached</code> method:
+                    <pre>
+from abTest.models import Goal
+def subscribedToNewsletter(request):
+    goal = Goal.objects.get(name = 'subscribed newsletter')
+    goal.reached(request)
+                    </pre>
+                    For your convenient, there is a little helper <code>goalReached</code>:
+                    <pre>
+from abTest import goalReached
+def subscribedToNewsletter(request):
+    goalReached(request, 'subscribed newsletter')
+                    </pre>
+                </p>
+            </div>
+            <div class="tab-pane" id="experiment">
+                <p>Experiments are the things you try. If you test different background colors, your experiments could be
+                    <ul>
+                        <li>blue</li>
+                        <li>red</li>
+                        <li>green</li>
+                        <li>...</li>
+                    </ul>
+                </p>
+                <p>
+                    Templates and views have access to the current experiment, through abTest's context processor
+                    and middleware. See <a href="{% url 'liveDemo' %}">live demo</a> for more details.
+                </p>
+            </div>
+            <div class="tab-pane" id="test">
+                <p>A test brings goals and experiments together. In our example of different background colors, you might
+                    define the three Experiments <code>red blue green</code> with goals <code>subscribeNewsletter buySomething</code>.
+                </p>
+                <p>Test's (unique) name is important. It is not recommended to use spaces here. This could bring you into trouble in you templates:
+                <code>{% templatetag openvariable%} ab.subscribe newsletter {% templatetag closevariable %}</code> does not work;
+                <code>{% templatetag openvariable%} ab.subscribeNewsletter {% templatetag closevariable %}</code> does.</p>
+            </div>
+            <div class="tab-pane" id="testResult">
+                <p>For every session, abTest's middleware choose randomly one experiment per active test and creates a
+                    testResult object, holding this experiment and test. Whenever one goal of these tests get reached,
+                    corresponding testResult's goals get updated.
+                </p>
+                <p>AbTest's middlelare takes care for choosing experiments, creating test result objects and store the
+                reference in django session.</p>
+                <p>To measure the success of single experiments you will typically look to TestResult objects and count
+                reached goals (see live demo).</p>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

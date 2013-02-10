@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="hero-unit">
+        <h1>Introduction</h1>
+        <p>What is this lib about?</p>
+        <p>AB Testing is very specific, but on higher level it becomes always the same: you prepare two ore more experiments to measure the success.</p>
+        <p>The lib takes care for managing tests, goals, results and experiments. 'Managing' means providing the models;
+            together with appropriated helper, giving you always access to current experiment and goals.
+        </p>
+        <p>See sections below, to learn more about internals and usage.</p>
+        <div class="row">
+            <div class="span3">
+                <h2>Model</h2>
+                <p>We have goals, tests, experiments and results.</p>
+                <a href="{% url 'models' %}" class="btn btn-primary pull-right">
+                    more
+                </a>
+            </div>
+            <div class="span3">
+                <h2>Usage</h2>
+                <p>See, what components can help you with your tests.</p>
+                <a href="{% url 'usage' %}" class="btn btn-primary pull-right">
+                    more
+                </a>
+            </div>
+            <div class="span3">
+                <h2>Live Demo</h2>
+                <p>Everything in action.</p><br/>
+                <a href="{% url 'liveDemo' %}" class="btn btn-primary pull-right">
+                    more
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

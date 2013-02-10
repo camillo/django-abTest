@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <p>Test data are not available in database.</p>
+        <p>We need:
+            <ol>
+                <li>Test with name <code>background</code></li>
+                <li>Goal with name <code>buttonPressed</code></li>
+                <li>Three experiments <code>red</code>, <code>blue</code> and <code>green</code></li>
+            </ol>
+            Goal and experiments needs to be added to Test; test has to be active.
+        </p>
+        <p>
+            You can add these objects, using the <a href="{% url 'admin:index' %}">admin</a> (recommended to learn things),
+            or press the button to generate test data.
+        </p>
+        <form method="post">
+            <input type="submit" value="generate data" />
+            <p>
+                This is, what will happen behind the scenes (in the view):
+                <pre>
+test = Test.objects.create(name = "background", active = True)
+test.goals.add(Goal.objects.create(name = "buttonPressed"))
+test.experiments.add(Experiment.objects.create(name="red"))
+test.experiments.add(Experiment.objects.create(name="blue"))
+test.experiments.add(Experiment.objects.create(name="green"))
+test.save()
+                </pre>
+            </p>
+        </form>
+    </div>
+{% endblock %}

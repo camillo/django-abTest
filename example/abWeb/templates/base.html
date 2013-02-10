@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <link href="/static/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="/static/base.css" rel="stylesheet">
+        <style type="text/css">
+            {% block extraCss %}{% endblock %}
+        </style>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="/">AB Tests</a>
+                    <ul class="nav">
+                        <li{% if site == "models" %} class = "active"{% endif %}>
+                            <a href="{% url 'models' %}">Model</a>
+                        </li>
+                        <li{% if site == "usage" %} class = "active"{% endif %}>
+                            <a href="{% url 'usage' %}">Usage</a>
+                        </li>
+                        <li{% if site == "liveDemo" %} class = "active"{% endif %}>
+                            <a href="{% url 'liveDemo' %}">Live Demo</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            {% if messages %}
+                <div class="row">
+                    {% for message in messages %}
+                        <div class="alert{% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+        <script src="/static/jquery.min.js"></script>
+        <script src="/static/bootstrap.min.js"></script>
+
+    </body>
+</html>
