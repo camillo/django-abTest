@@ -4,6 +4,10 @@ from abTest import goalReached, render_to_ab_response
 from abTest.middleware import SESSION_NAME
 from abTest.models import Test, TestResult, Goal, Experiment
 
+def contact(request):
+    context = RequestContext(request)
+    return render_to_response("contact.html", context_instance = context)
+
 
 def home(request):
     context = RequestContext(request)

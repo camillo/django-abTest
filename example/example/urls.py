@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     url(r'^spendMoney/$', 'abWeb.views.reachedGoalButton', name='spendMoney'),
     url(r'^usage/$', 'abWeb.views.usage', name='usage'),
     url(r'^models/$', 'abWeb.views.models', name='models'),
+    url(r'^contact/$', 'abWeb.views.contact', name='contact'),
+
 
     url(r'^admin/', include(admin.site.urls)),
 )
