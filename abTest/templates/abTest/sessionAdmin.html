@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>abTest session admin</title>
+    </head>
+    <body>
+        <h1>Configure abTest session</h1>
+        <h2>active tests</h2>
+        {% for test, result in ab.items %}
+            <div class="abTest">
+                <h3>{{ test }}</h3>
+                <div class="experiments">
+                    <ul>
+                        {% for experiment in test.raw.experiments.all %}
+                            <li class="experiment{% if experiment.name == result %} active{% endif %}">{{ experiment }}
+                                {% if experiment.name == result %}
+                                    <span class="activeLabel">(active)</span>
+                                {% else %}
+                                    <a href="{% url 'abTest:setExperiment' experiment.name %}" class="experimentSetter">set</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    </body>
+</html>

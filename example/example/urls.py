@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from abTest import urls as abTestUrls
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -10,7 +11,7 @@ urlpatterns = patterns('',
     url(r'^usage/$', 'abWeb.views.usage', name='usage'),
     url(r'^models/$', 'abWeb.views.models', name='models'),
     url(r'^contact/$', 'abWeb.views.contact', name='contact'),
-
+    url(r'^abTest/', include(abTestUrls, namespace="abTest")),
 
     url(r'^admin/', include(admin.site.urls)),
 )

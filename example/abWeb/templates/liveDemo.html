@@ -149,8 +149,25 @@ def reachedGoalButton(request):
             </div>
         </div>
         <div class="span4">
-            <a href="{% url 'clearSession' %}" class="btn">clear session</a>
+            <p>Use buttons below to set the experiment for your session, or clear the session to get random settings.
+                This feature is designed for development and debug. Feel free to use it live, if you see any needs.</p>
+            <div class="row">
+                {% for test, result in request.abTest.items %}
+                    {% if test.name == "background" %}
+                        {% for experiment in test.experiments.all %}
+                            <div class="span1"><a href="{% url 'abTest:setExperiment' experiment.name %}" style="color: {{ experiment }};" class="btn">{{ experiment }}</a></div>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <div class="span1"><a href="{% url 'clearSession' %}" class="btn">clear</a></div>
+            </div>
+            <div class="row"><div class="span4">
+                <p>abTest framework ships with a generic session admin to help you during development. See it <a href="{% url 'abTest:sessionAdmin' %}">here</a>.</p>
+            </div></div>
+            <div style="display:none;" class="row"><div class="span4">
+                <p>to get the url for experiment setter, use something like this in your template:
+                    <code>{% templatetag openblock %} url 'abTest:setExperiment' 'red' {% templatetag closeblock %}</code></p>
+            </div></div>
         </div>
-
     </div>
 {% endblock %}

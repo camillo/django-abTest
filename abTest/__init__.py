@@ -1,5 +1,5 @@
 from logging import getLogger
-from models import Goal
+from models import Goal, Experiment
 
 from django.conf import settings
 from django.shortcuts import render_to_response
@@ -11,7 +11,6 @@ def render_to_ab_response(abTest, templates, dictionary=None, defaultTemplate = 
     for test, result in abTest.items():
         if result.experiment.name in templates:
             targetTemplate = templates[result.experiment.name]
-            print "I choose template: %s" % targetTemplate
             break
     return render_to_response(targetTemplate, dictionary, context_instance = context_instance)
 
@@ -27,3 +26,10 @@ def goalReached(request, name, commit = True, failSilent=None):
         if not failSilent:
             raise
         return []
+
+def setExperiment(request, name):
+    experiment = Experiment.objects.get(name=name)
+    for test, result in request.abTest.items():
+        if experiment in test.experiments.all():
+            result.experiment = experiment
+            result.save()
