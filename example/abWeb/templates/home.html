@@ -3,35 +3,59 @@
     <div class="hero-unit">
         <h1>Django AB-Testing</h1>
         <p>What is this lib about?</p>
-        <p>AB Testing is very specific, but on higher level it becomes always the same: you prepare two ore more experiments to measure the success.</p>
-        <p>The lib takes care for managing tests, goals, results and experiments. 'Managing' means providing the models;
-            together with appropriated helper, giving you always access to current experiment and goals.
+        <p>AB Testing is very specific, but the basics are same: you prepare two ore more experiments to measure the success.</p>
+        <p>The lib takes care for managing and providing tests, goals, results and experiments.
         </p>
-
-        <p>See sections below, to learn more about internals and usage.</p>
-        <div class="row">
-            <div class="span3">
-                <h2>Model</h2>
-                <p>We have goals, tests, experiments and results.</p>
-                <a href="{% url 'models' %}" class="btn btn-primary pull-right">
-                    more
-                </a>
-            </div>
-            <div class="span3">
-                <h2>Usage</h2>
-                <p>See, what components can help you with your tests.</p>
-                <a href="{% url 'usage' %}" class="btn btn-primary pull-right">
-                    more
-                </a>
-            </div>
-            <div class="span3">
-                <h2>Live Demo</h2>
-                <p>Everything in action.</p><br/>
-                <a href="{% url 'liveDemo' %}" class="btn btn-primary pull-right">
-                    more
-                </a>
-            </div>
+    </div>
+    <div class="row">
+        <div class="span9">
+            <h2>Implementation</h2>
+            <p>
+                I think we can divide implementations into two groups:
+                <ol>
+                    <li>switches in templates
+                        <p>
+                            Changes for tests are implemented in the 'live' template. Obviously the template needs to know
+                            about the current experiments, to render the correct experiment. Advantage of this method is fast implementation
+                            and you have everything at one place; but you should implement default handlers for your switches,
+                            if tests become inactive and experiments are not longer provided to the template.
+                        </p>
+                    </li>
+                    <li>one template per experiment
+                        <p>You do not touch your live templates, but create a new (probably derived) template per Experiment.
+                            In this scenario the view needs to know about the current active experiments.
+                        </p>
+                    </li>
+                </ol>
+                The lib allows you to mix both methods as you like, by shipping a middleware that choose and store experiments
+                per session. They are available in request.abTest; together with a context processor, that make these
+                information available to templates.
+            </p>
         </div>
     </div>
+    <div class="row">
+        <div class="span3">
+            <h2>Model</h2>
+            <p>We have goals, tests, experiments and results.</p>
+            <a href="{% url 'models' %}" class="btn btn-primary pull-right">
+                more
+            </a>
+        </div>
+        <div class="span3">
+            <h2>Usage</h2>
+            <p>See, what components can help you with your tests.</p>
+            <a href="{% url 'usage' %}" class="btn btn-primary pull-right">
+                more
+            </a>
+        </div>
+        <div class="span3">
+            <h2>Live Demo</h2>
+            <p>Everything in action.</p><br/>
+            <a href="{% url 'liveDemo' %}" class="btn btn-primary pull-right">
+                more
+            </a>
+        </div>
+    </div>
+
 {% endblock %}
 

@@ -56,6 +56,7 @@
             <ul class="nav nav-tabs" id="myTab">
                 <li class="active"><a href="#about" data-toggle="tab">About</a></li>
                 <li><a href="#inside" data-toggle="tab">Inside</a></li>
+                <li><a href="#debug" data-toggle="tab">Debug</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="about">
@@ -145,10 +146,12 @@ def reachedGoalButton(request):
     success(request, "thx for your money...")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
                     </pre>
-                    <h3>Debug features</h3>
+                </div>
+
+                <div class="tab-pane" id="debug">
                     <p>On this page, we use abTest debug features to change current experiments. They are called 'debug'
-                    features because they are designed to help you during development and debug; feel totally free to use
-                    them live.</p>
+                        features because they are designed to help you during development and debug; feel totally free to use
+                        them live.</p>
                     <p>abTest brings some debug views. Add an import in your urls.py, to activate them:</p>
                     <pre>
 from abTest import urls as abTestUrls
@@ -161,7 +164,7 @@ urlpatterns = patterns('',
                         <code>abTest/sessionAdmin.html</code> and set it there, if you want
                         to use the sessionAdmin.
                     </p>
-                    <p><code>abTest:setExperiment, args = ['exampleName',]</code></p>
+                    <h4>abTest:setExperiment, args = ['exampleName',]</h4>
                     <p>set experiment with given name for current session. We use this here, to provide links
                         for the red, green, blue buttons:
                         <pre>
@@ -174,18 +177,27 @@ urlpatterns = patterns('',
 {% templatetag openblock %} endfor {% templatetag closeblock %}
                         </pre>
                     </p>
-                    <p><code>abTest:clear</code></p>
+                    <h4>abTest:clear</h4>
                     <p>Stop all tests, clear session and request. Next request will create a new test session with random experiments.
-                        <code>&lt;a href="{% templatetag openblock %} url 'abTest:clear'{% templatetag closeblock %}"&gt;clear&lt;/a&gt;</code>
+                        <code>&lt;a href="{% templatetag openblock %} url 'abTest:clear'{% templatetag closeblock %}"&gt;clear&lt;/a&gt;</code> -
+                        This call only affects caller's session.
                     </p>
-                    <p><code>abTest:sessionAdmin</code></p>
+                    <p>
+                        <code>setExperiment</code> and <code>clear</code> accepts a next parameter (post or get) to redirect to after execution.
+                        If not given, settings will be checked, then HTTP_REFERER; fallback is '/'
+                    </p>
+                    <p>
+                        In case of ajax calls, methods simple return HttpResponse('ok')
+                    </p>
+                    <h4>abTest:sessionAdmin</h4>
                     <p>Show the generic session admin page. It shows all active tests with their experiments and let
-                    you activate single ones. Simple link to the view, if you want to use it:
+                        you activate single ones. Simple link to the view, if you want to use it:
                         <pre>
 See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% templatetag closeblock %}"&gt;here.&lt;/a&gt;
                         </pre>
                     </p>
                 </div>
+
             </div>
         </div>
         <div class="span4">

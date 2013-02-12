@@ -48,6 +48,11 @@ def subscribedToNewsletter(request):
                     Templates and views have access to the current experiment, through abTest's context processor
                     and middleware. See <a href="{% url 'liveDemo' %}">live demo</a> for more details.
                 </p>
+                <p>
+                    Per default, experiments are active. Deactivate single or all (but one) to change or end the
+                    test (using the last active experiment). This allows you to react very fast to results, without the
+                    need to deactivate abTesting in the templates; what can be done later.
+                </p>
             </div>
             <div class="tab-pane" id="test">
                 <p>A test brings goals and experiments together. In our example of different background colors, you might

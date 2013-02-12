@@ -4,6 +4,9 @@ It handles Tests, with their experiments, goals and results.
 
 Quick start:
 cd example
+
+If you are on windows, you need to edit example/settings.py to change path of db from /tmp/django_ABTest.db to c:\tmp\whatever.
+
 ./manage.py syncdb
 ./manage.py runserver
 

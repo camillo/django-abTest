@@ -1,5 +1,6 @@
 from random import choice
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Goal(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -20,6 +21,7 @@ class Goal(models.Model):
 
 class Experiment(models.Model):
     name = models.CharField(max_length=20, unique=True)
+    active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
@@ -41,7 +43,7 @@ class TestResult(models.Model):
 
     @classmethod
     def createRandom(cls, test, commit=True):
-        experiment = choice(test.experiments.all())
+        experiment = choice(test.experiments.filter(active=True))
         ret = TestResult.objects.create(test = test, experiment = experiment, finished = False)
         if commit:
             ret.save()
