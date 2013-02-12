@@ -63,12 +63,6 @@ def reachedGoalButton(request):
     success(request, "thx for your money...")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-def clearSession(request):
-    request.abTest = {}
-    request.session[SESSION_NAME] = {}
-    success(request, "session cleared; new testrun with random settings started")
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
 def models(request):
     context = RequestContext(request)
     return render_to_response("models.html", {'site':'models'}, context_instance = context)

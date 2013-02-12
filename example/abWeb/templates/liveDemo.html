@@ -66,7 +66,7 @@
                         We try three experiments with different background colors. Your session is chosen to try [{{ ab.background }}].
                         Check for yourself that this will not change by refreshing the browser.
                     </p>
-                    <p> Feel free to press the button, or  <a href="{% url 'clearSession' %}">clear</a> the session to create a new test run.</p>
+                    <p> Feel free to press the button, or  <a href="{% url 'abTest:clear' %}">clear</a> the session to create a new test run.</p>
                     <p>See success of our experiments on stats to the right. Note, that the same goal cannot reached twice. Pressing the buy
                     button will effect stats only once per session.</p>
                     <p>Check Inside tab for implementation details.</p>
@@ -162,15 +162,21 @@ urlpatterns = patterns('',
                         to use the sessionAdmin.
                     </p>
                     <p><code>abTest:setExperiment, args = ['exampleName',]</code></p>
-                    <p>set experiment with given name active for current session. We use this here, to provide links
+                    <p>set experiment with given name for current session. We use this here, to provide links
                         for the red, green, blue buttons:
                         <pre>
-{% templatetag openblock %} for experiment in test.experiments.all {% templatetag closeblock %}
-    &lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' experiment.name {% templatetag closeblock %}
-        style="color: {% templatetag openvariable %} experiment {% templatetag closevariable %};" class="btn"&gt;
-        {% templatetag openvariable %} experiment {% templatetag closevariable %}&lt;/a&gt;
+{% templatetag openblock %} for experiment in ab.background.experiments {% templatetag closeblock %}
+    &lt;div class="span1"&gt;
+        &lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' experiment.name {% templatetag closeblock %}"
+            style="color: {% templatetag openvariable %} experiment {% templatetag closevariable %};" class="btn"&gt;
+            {% templatetag openvariable %} experiment {% templatetag closevariable %}&lt;/a&gt;
+    &lt;/div&gt;
 {% templatetag openblock %} endfor {% templatetag closeblock %}
                         </pre>
+                    </p>
+                    <p><code>abTest:clear</code></p>
+                    <p>Stop all tests, clear session and request. Next request will create a new test session with random experiments.
+                        <code>&lt;a href="{% templatetag openblock %} url 'abTest:clear'{% templatetag closeblock %}"&gt;clear&lt;/a&gt;</code>
                     </p>
                     <p><code>abTest:sessionAdmin</code></p>
                     <p>Show the generic session admin page. It shows all active tests with their experiments and let
@@ -186,14 +192,10 @@ See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% temp
             <p>Use buttons below to set the experiment for your session, or clear the session to get random settings.
                 This feature is designed for development and debug. Feel free to use it live, if you see any needs.</p>
             <div class="row">
-                {% for test, result in request.abTest.items %}
-                    {% if test.name == "background" %}
-                        {% for experiment in test.experiments.all %}
-                            <div class="span1"><a href="{% url 'abTest:setExperiment' experiment.name %}" style="color: {{ experiment }};" class="btn">{{ experiment }}</a></div>
-                        {% endfor %}
-                    {% endif %}
+                {% for experiment in ab.background.experiments %}
+                    <div class="span1"><a href="{% url 'abTest:setExperiment' experiment.name %}" style="color: {{ experiment }};" class="btn">{{ experiment }}</a></div>
                 {% endfor %}
-                <div class="span1"><a href="{% url 'clearSession' %}" class="btn">clear</a></div>
+                <div class="span1"><a href="{% url 'abTest:clear' %}" class="btn">clear</a></div>
             </div>
             <div class="row"><div class="span4">
                 <p>abTest framework ships with a generic session admin to help you during development. See it <a href="{% url 'abTest:sessionAdmin' %}">here</a>.</p>
