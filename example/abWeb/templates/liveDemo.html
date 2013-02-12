@@ -145,6 +145,40 @@ def reachedGoalButton(request):
     success(request, "thx for your money...")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
                     </pre>
+                    <h3>Debug features</h3>
+                    <p>On this page, we use abTest debug features to change current experiments. They are called 'debug'
+                    features because they are designed to help you during development and debug; feel totally free to use
+                    them live.</p>
+                    <p>abTest brings some debug views. Add an import in your urls.py, to activate them:</p>
+                    <pre>
+from abTest import urls as abTestUrls
+urlpatterns = patterns('',
+    ...
+    url(r'^abTest/', include(abTestUrls, namespace="abTest")),
+)
+                    </pre>
+                    <p>If you want to use an other namespace, you need to override template
+                        <code>abTest/sessionAdmin.html</code> and set it there, if you want
+                        to use the sessionAdmin.
+                    </p>
+                    <p><code>abTest:setExperiment, args = ['exampleName',]</code></p>
+                    <p>set experiment with given name active for current session. We use this here, to provide links
+                        for the red, green, blue buttons:
+                        <pre>
+{% templatetag openblock %} for experiment in test.experiments.all {% templatetag closeblock %}
+    &lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' experiment.name {% templatetag closeblock %}
+        style="color: {% templatetag openvariable %} experiment {% templatetag closevariable %};" class="btn"&gt;
+        {% templatetag openvariable %} experiment {% templatetag closevariable %}&lt;/a&gt;
+{% templatetag openblock %} endfor {% templatetag closeblock %}
+                        </pre>
+                    </p>
+                    <p><code>abTest:sessionAdmin</code></p>
+                    <p>Show the generic session admin page. It shows all active tests with their experiments and let
+                    you activate single ones. Simple link to the view, if you want to use it:
+                        <pre>
+See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% templatetag closeblock %}"&gt;here.&lt;/a&gt;
+                        </pre>
+                    </p>
                 </div>
             </div>
         </div>
