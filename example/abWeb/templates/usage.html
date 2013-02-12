@@ -31,6 +31,15 @@ MIDDLEWARE_CLASSES = (
             <p>It is totally legal to not use the middleware, but if you go this way, the models are all you get
                 from the framework. The provided helper for reaching goals, choosing experiments, etc require the middleware.
             </p>
+            <p>
+                If you do not want to get the experiments chosen random, you may provide a setting
+                <code>AB_TEST_EXPERIMENT_CHOOSER</code> which must point to a function that accepts request and test as parameters.
+                <pre>
+def chooseFirst(request, test):
+    return test.experiments.all()[0]
+                </pre>
+                See settings.py of this website for an example.
+            </p>
         </p>
         <h2>Access experiments in template</h2>
         <p>abTest framework ships with a context processor <code>abTest.context_processors.ab</code>. It puts a dictionary

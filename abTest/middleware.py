@@ -22,14 +22,15 @@ class RequestMiddleware(object):
                     try:
                         activeTestResult = TestResult.objects.get(pk=sessionTests[activeTest.pk])
                     except TestResult.DoesNotExist:
-                        activeTestResult = TestResult.createRandom(activeTest)
+                        activeTestResult = TestResult.createRandom(request, activeTest)
                 else:
-                    activeTestResult = TestResult.createRandom(activeTest)
+                    activeTestResult = TestResult.createRandom(request, activeTest)
                 newSessionTests[activeTest.pk] = activeTestResult.pk
                 requestTests[activeTest] = activeTestResult
             request.session[SESSION_NAME] = newSessionTests
             request.abTest = requestTests
-        except:
+        except Exception as ex:
+            print "ex!!: %s" % ex
             pass #todo: log? our middleware should not break the application
 
         return None

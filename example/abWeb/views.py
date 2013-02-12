@@ -51,7 +51,6 @@ def liveDemo(request):
         testResult['reachedGoals'] = reachedTotal
         testResult['experiments'] = experiments
         testResults[test] = testResult
-        print "%s" % testResults
     return render_to_response("liveDemo.html", {'testResults' : testResults, 'site':'liveDemo'}, context_instance = context)
 
 def reachedGoalButton(request):

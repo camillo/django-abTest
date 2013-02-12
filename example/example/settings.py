@@ -34,6 +34,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
                                                # needs, add the request processor. Find dict with active tests and chosen
                                                # experiments in request.abTest.
     )
+from abWeb import exampleChooser               # <- this is only done for demonstration
+AB_TEST_EXPERIMENT_CHOOSER = exampleChooser    # exampleChooser has same implementation than default.
 
 # **********************************************************
 # boring stuff

@@ -1,6 +1,6 @@
-from random import choice
+# from random import choice
 from django.db import models
-from django.core.exceptions import ValidationError
+from abTest import settings
 
 class Goal(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -42,8 +42,10 @@ class TestResult(models.Model):
     finished = models.BooleanField()
 
     @classmethod
-    def createRandom(cls, test, commit=True):
-        experiment = choice(test.experiments.filter(active=True))
+    def createRandom(cls, request, test, commit=True):
+        chooser = settings.AB_TEST_EXPERIMENT_CHOOSER
+        experiment = chooser(request, test)
+        #experiment = choice(test.experiments.filter(active=True))
         ret = TestResult.objects.create(test = test, experiment = experiment, finished = False)
         if commit:
             ret.save()
