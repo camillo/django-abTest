@@ -2,6 +2,7 @@
 # interesting stuff
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware', # <- *****************************************
     'abTest.middleware.RequestMiddleware', # <- It is VERY important to put abTest AFTER SessionMiddleware
     'django.contrib.auth.middleware.AuthenticationMiddleware',
