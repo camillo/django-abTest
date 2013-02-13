@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, HttpResponse, RequestContext, HttpResponseRedirect
 from django.contrib.messages import success
 from abTest import goalReached, render_to_ab_response
-from abTest.middleware import SESSION_NAME
+
 from abTest.models import Test, TestResult, Goal, Experiment
 
 def contact(request):

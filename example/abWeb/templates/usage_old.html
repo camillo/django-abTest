@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <h2>Full Example</h2>
+        <p>See <a href="{% url 'liveDemo' %}">live demo</a>. 'Inside' tab reads all needed settings and code.</p>
+        <h2>Create tests and experiments</h2>
+        <p>
+            Django's admin interface can be used to create your tests. Do not forget to set your test active.
+            Creating abTest's models, does not contains any magic. You may also use your database cli or pure python
+            code.
+            <pre>
+test = Test.objects.create(name = "background", active = True)
+test.goals.add(Goal.objects.create(name = "buttonPressed"))
+test.experiments.add(Experiment.objects.create(name="red"))
+test.experiments.add(Experiment.objects.create(name="blue"))
+test.experiments.add(Experiment.objects.create(name="green"))
+test.save()
+            </pre>
+        </p>
+        <h2>Choose random experiment per session and test</h2>
+        <p>This is done by abTest's middleware.
+            <pre>
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'abTest.middleware.RequestMiddleware', # <- It is VERY important to put abTest AFTER SessionMiddleware
+            </pre>
+            It puts a dictionary <code>abTest</code> into every request. This holds for every active test current session's
+            test result. Result holds the active experiment, reached goals and stuff. 'Normal' user will not handle with
+            these objects, but use higher level helper described below.
+            <p>It is totally legal to not use the middleware, but if you go this way, the models are all you get
+                from the framework. The provided helper for reaching goals, choosing experiments, etc require the middleware.
+            </p>
+            <p>
+                If you do not want to get the experiments chosen random, you may provide a setting
+                <code>AB_TEST_EXPERIMENT_CHOOSER</code> which must point to a function that accepts request and test as parameters.
+                <pre>
+def chooseFirst(request, test):
+    return test.experiments.all()[0]
+                </pre>
+                See settings.py of this website for an example.
+            </p>
+        </p>
+        <h2>Access experiments in template</h2>
+        <p>abTest framework ships with a context processor <code>abTest.context_processors.ab</code>. It puts a dictionary
+            named 'ab' into template context, holding the name of current experiment for every active test. This is, how
+            it can be used:
+            <pre>
+&lt;div class="abBackground-{% templatetag openvariable %} ab.background {% templatetag closevariable %}">
+
+    {% templatetag openblock %} if ab.greeting == "formal" {% templatetag closeblock %}
+        Dear Sir,
+    {% templatetag openblock %} elif ab.greeting == "street" {% templatetag closeblock %}
+        Hi, my friend
+    {% templatetag openblock %} else {% templatetag closeblock %}
+        Hello
+    {% templatetag openblock %} endif {% templatetag closeblock %}
+
+            </pre>
+            A css class is set, based on the name of experiment for test <code>background</code>.<br/>
+            The user greeting is chosen, using test <code>greeting</code>. It is a good advice to always haven a
+            fallback. This prevents your side to break if tests get deactivated.
+            <p>
+                If strings are not enough for your needs, you can access the full model objects via <code>request.abTest</code>. To do
+                this, you need to add <code>django.core.context_processors.request</code> to your
+                <code>TEMPLATE_CONTEXT_PROCESSORS</code> settings.
+            </p>
+        </p>
+        <h2>Access experiments in view</h2>
+        <p>You might not want to customize the templates for ab testing, but use different templates per experiment.
+            Most basic scenarios can be handled very easy with provided helper <code>render_to_ab_response(abTest, templates, dictionary=None, defaultTemplate = None, context_instance=None)</code>:
+            <pre>
+from abTest import render_to_ab_response
+def home(request):
+    context = RequestContext(request)
+    return render_to_ab_response(request.abTest, {
+        'red' : 'home_red.html',
+        'blue' : 'home_blue.html',
+        'black' : 'home_black.html',
+    }, defaultTemplate="home.html", context_instance=context)
+            </pre>
+            <code>red, blue, black</code> are names of experiments. First matching experiment wins. If you have more
+            than one active test, you should not mix the experiments here. But it's up to you. First matching experiment
+            wins.
+            <p>
+                If you need to make more complex decisions, you can access the active tests with their current results and
+                experiments via <code>request.abTest</code>.
+            </p>
+        </p>
+        <h2>Reaching goals</h2>
+        <p>
+            Whenever your application knows, that a goal is reached, it should tell the abTest framework. This is done,
+            by calling the <code>reached</code> method on the goal.
+            <pre>
+from abTest.models import Goal
+def subscribedNewsletter(request):
+    goal = Goal.objects.get("subscribed newsletter")
+    goal.reached(request)
+            </pre>
+            For your convenient there is a little helper <code>goalReached(request, name, commit = True, failSilent=None)</code>.
+            <pre>
+from abTest import goalReached
+def subscribedNewsletter(request):
+    goalReached(request, "subscribed newsletter")
+            </pre>
+            If you do not provide <code>failSilent</code>, exceptions will be eaten (but logged) in live deployment and raised with <code>DEBUG=TRUE</code>.
+            <p>Normally your view should know, when goals got reached. If for some reason only your js knows, you can call such a view via ajax.</p>
+        </p>
+    </div>
+{% endblock %}

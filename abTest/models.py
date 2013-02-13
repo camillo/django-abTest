@@ -4,6 +4,7 @@ from abTest import settings
 
 class Goal(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    value = models.IntegerField(default=1)
 
     def reached(self, request, commit = True):
         ret = []
