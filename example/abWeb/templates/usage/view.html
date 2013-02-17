@@ -1,0 +1,54 @@
+<p>
+    The framework offers helper and information, that can be used in views. It is totally possible to implement ab tests
+    without changing a single line of code in any view. In this case you implement your tests in templates and use
+    shipped views to notify about reached goals. This is described in 'Template' tab.
+</p>
+<p>If you choose to do some work in views, this is what you have in your tool box:</p>
+<h3>Accessing current tests and experiments</h3>
+<p>
+    abTest's middleware writes an object named <code>ab</code> into every request. It's a dict, that holds current
+    session's test result per test. For your convenient it provides magic functions (test names), returning current experiment.
+    This is how you can use it:
+    <pre>
+def demo(request):
+    currentBackground = request.ab.background
+    </pre>
+</p>
+<h3>Use different templates per experiment</h3>
+<p>
+    abTest framework ships a helper function that dispatch the template to use, based on experiment's name:
+    <pre>
+from abTest import render_to_ab_response
+def home(request):
+    context = RequestContext(request)
+    return render_to_ab_response(request.abTest, {
+        'red' : 'home_red.html',
+        'blue' : 'home_blue.html',
+        'black' : 'home_black.html',
+    }, defaultTemplate="home.html", {}, context_instance=context)
+    </pre>
+</p>
+<h3>Reaching goals</h3>
+<p>As soon as you know, that a goal was reached you should tell the framework.</p>
+<p>If you have an instance of the goal, simple call <code>goal.reached(request)</code>.</p>
+<p>If you only know the name of the goal, this helper becomes useful:
+    <pre>
+from abTest import goalReached
+def subscribedNewsletter(request):
+    goalReached(request, "subscribedNewsletter")
+    </pre>
+</p>
+
+<h3>Setting active experiments</h3>
+<p>
+    If you want to change the active experiment for a test, call the <code>setExperiment</code> helper, that
+    accepts strings or models.
+    <pre>
+from abTest import setExperiment
+def myView(request):
+    setExperiment(request, 'background', 'red')
+    # or, if you have instances from test and/or experiment
+    # ...
+    setExperiment(request, test, experiment)
+</pre>
+</p>

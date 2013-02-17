@@ -1,0 +1,73 @@
+<p>In django's admin, a test named <code>background</code> was created. We added three experiments
+    <code>red blue green</code>, together with new goal <code>buttonPressed</code>.
+</p>
+<p>Three classes with css got introduced, to prepare the test:</p>
+<pre>
+.abBackground-green {
+    background: green;
+}
+.abBackground-red {
+    background: red;
+}
+.abBackground-blue {
+    background: blue;
+}
+                    </pre>
+
+<p>The correct class is set inside the template via:
+    <code>
+        &lt;div class="abBackground-{% templatetag openvariable %} ab.background {% templatetag closevariable %}">
+    </code></p>
+<p>Dictionary 'ab' in context, holds current experiment's name for every active test.
+    This is done by abTest's context processor. Obviously it must be registerd in settings.py:</p>
+<pre>
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+
+    # Stuff above is default, if TEMPLATE_CONTEXT_PROCESSORS is not set.
+    "abTest.context_processors.ab",
+    )
+
+                    </pre>
+<p>The work behind the scenes
+<ul>
+    <li>choose experiments for new sessions</li>
+    <li>create new TestResult for every session</li>
+    <li>save these information in session</li>
+    <li>put abTest object into every request (where context processor and everyone else can
+        use it)</li>
+</ul>
+is done in abTest's middleware:
+</p>
+<pre>
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # It is VERY important to put abTest AFTER SessionMiddleware
+    'abTest.middleware.RequestMiddleware',
+}
+                    </pre>
+<p>
+    abTest itself needs to be registered in INSTALLED_APPS:
+<pre>
+INSTALLED_APPS = (
+    'abTest',
+)
+                        </pre>
+</p>
+<p>Last missing thing: We need to tell the abTest framework about pressed buttons (reached goals).
+    Here, it is done inside the view, that handles the button click:
+</p>
+<pre>
+from abTest import goalReached
+def reachedGoalButton(request):
+    goalReached(request, "buttonPressed")
+    success(request, "thx for your money...")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+                    </pre>

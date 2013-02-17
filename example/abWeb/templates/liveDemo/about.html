@@ -1,0 +1,11 @@
+<p>
+    On this side, we want the user to buy something on div above, by pressing the button.
+</p>
+<p>
+    We try three experiments with different background colors. Your session is chosen to try [{{ ab.background }}].
+    Check for yourself that this will not change by refreshing the browser.
+</p>
+<p> Feel free to press the button, or  <a href="{% url 'abTest:clear' %}">clear</a> the session to create a new test run.</p>
+<p>See success of our experiments on stats to the right. Note, that the same goal cannot reached twice. Pressing the buy
+    button will effect stats only once per session.</p>
+<p>Check Inside tab for implementation details.</p>

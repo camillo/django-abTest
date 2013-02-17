@@ -1,0 +1,26 @@
+{% extends "admin/app_index.html" %}
+{% load i18n admin_static %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="module">
+        <table>
+            <caption>{% trans "Session admin" %} - <a href="{% url "admin:abTest_test_clearSession" %}">clear session</a></caption>
+            {% for test, experiment in ab.items %}
+                <tr>
+                    <th scope="row">{{ test }}</th>
+                    <td>&nbsp;</td>
+                    <td>
+                        <select id="idSetExperiment{{ test.raw.pk }}" size="1" onchange="window.location=this.value;">
+                            {% for currentExperiment in test.raw.experiments.all %}
+                                <option value='{% url "admin:abTest_test_setExperiment" test.raw.pk currentExperiment.pk %}' {% if currentExperiment.name == experiment %} selected{% endif %}>
+                                    {{ currentExperiment }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

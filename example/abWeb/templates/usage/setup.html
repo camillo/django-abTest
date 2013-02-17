@@ -1,0 +1,54 @@
+<p>For normal use these steps are required:</p>
+<ul>
+    <li>Add <code>abTest</code> to <code>INSTALLED_APPS</code>.</li>
+    <li>Add <code>abTest.middleware.RequestMiddleware</code> to <code>MIDDLEWARE_CLASSES</code>.</li>
+    <li>Add <code>abTest.context_processor.ab</code> to <code>TEMPLATE_CONTEXT_PROCESSORS</code></li>
+</ul>
+<p>Do not forget to run <code>./manage.py syncdb</code>.</p>
+<pre>
+INSTALLED_APPS = (
+    ...
+    'abTest',
+    ...
+)
+
+MIDDLEWARE_CLASSES = (
+    ...
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'abTest.middleware.RequestMiddleware', # <- It is VERY important to put abTest AFTER SessionMiddleware
+    ...
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    # Stuff above is default, if TEMPLATE_CONTEXT_PROCESSORS is not set.
+
+    "abTest.context_processors.ab",
+)
+</pre>
+<h3>Use provided views</h3>
+<p>
+    If you use 'normal' django admin, there is probably no need for these helper and debug views. If you want to use them,
+    it is recommended to import them into the namespace abTest, but feel free to call them one by one or not at all.
+    If you do not import the namespace, the <code>abTest/sessionAdmin.html</code> template will not work out of the box
+    (links like 'abTest:setExperiment' would not get resolved), but you could easy override the template and provide your links.
+    Again: this does not effect abTest integration into django's admin.
+    <pre>
+urlpatterns = patterns('',
+    ...
+    url(r'^abTest/', include(abTestUrls, namespace="abTest")),
+    ...
+)
+    </pre>
+</p>
+<h3>Maintenance</h3>
+<p>As long as you use the framework, the TestResult table will growth without limit. Call
+<code>./manange.py aggregateAbStats</code> to aggregate TestResult rows, write Statistics and delete testResult rows.
+</p>
+<p>On height traffic sites, it is recommended to call this command via cron daily or weekly.</p>

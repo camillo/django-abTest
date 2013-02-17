@@ -20,6 +20,7 @@ INSTALLED_APPS = (
 
     'abWeb',  # <- this is only the example docu website
 )
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
@@ -37,6 +38,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     )
 from abWeb import exampleChooser               # <- this is only done for demonstration
 AB_TEST_EXPERIMENT_CHOOSER = exampleChooser    # exampleChooser has same implementation than default.
+AB_TEST_FAIL_SILENT = False
+
+# Here we configure our debug views, to allow everything from everyone
+AB_TEST_DEBUG_VIEWS_RESTRICTIONS = ('staff', 'debug')
 
 # **********************************************************
 # boring stuff

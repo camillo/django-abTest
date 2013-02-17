@@ -1,0 +1,101 @@
+<p>
+    AbTest framework use a simple object model. The classes are:
+<ul>
+    <li>Test</li>
+    <li>Goal</li>
+    <li>Experiment</li>
+    <li>TestResult</li>
+</ul>
+</p>
+
+<div class="alert-info">
+    <p>
+        It is VERY recommended to use only those names, that would be valid python function names (no spaces for example).
+        There are no validators, so every name is fine for the framework; but you might loose the conveniences from
+        some helper, that provides magic function names (based on names of the models).
+    </p>
+</div>
+<p>For example: if you name your test <code>differentBackgroundColors</code>, you can check the active
+    experiment in your template very easy via
+    <code>{% templatetag openvariable %}ab.differentBackgroundColors{% templatetag closevariable %}</code>.
+    In case of <code>different background colors</code>, this would not work. You can still get all
+    information, but this leads to more complex templates (for this example you could use the <code>getExperiment</code>
+    template tag (see templates)).
+</p>
+<h3>Creating models</h3>
+<p>
+    You can use the <a href="{% url 'admin:index' %}">admin</a> to create Tests, Goals and Experiments. TestResults
+    are created and managed by the framework.
+</p>
+<p>Model creation contains no magic. Feel free to use your db shell, or python code:
+<pre>
+from abTest.models import Test, Goal, Experiment
+test = Test.objects.create(name = "background", active = True)
+test.goals.add(Goal.objects.create(name = "buttonPressed"))
+test.experiments.add(Experiment.objects.create(name="red"))
+test.experiments.add(Experiment.objects.create(name="blue"))
+test.experiments.add(Experiment.objects.create(name="green"))
+</pre>
+</p>
+<h3>Goal</h3>
+<p>
+    A goal is something you want to reach - selling something, newsletter subscription, clicking to a link,
+    open a page, whatever you want...
+</p>
+<p>You may define a value per goal (default is 1). This is an abstract number. If you try to sell contracts,
+    you might find it useful to define one goal per contract and use monthly fee as value. For statistics, values
+    of reached goals are summed and can make it easier to compare the success of experiments.</p>
+<p>
+    To tell the framework that a goal was reached, you need to call the <code>reached</code> method on the
+    goal instance. It updates the TestResult for current session and marks the goal as reached for all
+    relevant tests.
+<pre>
+from abTest.models import Goal
+def subscribedToNewsletter(request):
+    goal = Goal.objects.get(name = 'subscribedNewsletter')
+    goal.reached(request)
+                    </pre>
+<p>If you do not have an instance of the goal (like in the example above), you may use this little helper,
+    that accepts a string:
+<pre>
+from abTest import goalReached
+def subscribedToNewsletter(request):
+    goalReached(request, 'subscribedNewsletter')
+                        </pre>
+</p>
+</p>
+<h3>Experiment</h3>
+<p>
+    An abTest contains two ore more experiments, that are chosen randomly per session. This experiment
+    will not be changed during the session (except by provided debug tools).
+</p>
+<p>
+    Only active tests will be used, so you can deactivate a test during runtime without the need of
+    touching code or restarting anything.
+</p>
+<h3>Test</h3>
+<p>
+    A Test brings the components together. It defines a set of goals that can be reached, together with
+    the experiments to try.
+</p>
+<p>
+    Only active tests are considered to get used. Feel free to deactivate a test at runtime, but make sure that
+    your views and templates can handle the fact, that the test is no longer available.
+</p>
+<h3>TestResult</h3>
+<p>
+    The framework creates one TestResult per session and test. It holds the used experiment, together with reached goals. These
+    objects are used to create stats about success of experiments. 'Normally' you should not need to create instances by
+    yourself; feel free, if you think you should.
+</p>
+
+<h3>Statistics about your success</h3>
+<p>
+    As you know, abTest writes one TestResult per session into the database. This is an issue on sites with high traffic.
+    abTest framework ships a command <code>aggregateAbStats</code>, that collect all testResults, writes statistics and
+    delete the original rows. It is recommended to configure a crown job or something like this, that calls the command
+    once per day, week, month or whatever. Of course you loose some information, but check out the generated stats.
+    Probably they contains everything you need to know.
+    <p>Also here: No magic lies in TestResults. Write your own command than creates stats and delete TestResults if the
+    shipped one does not fit your needs.</p>
+</p>

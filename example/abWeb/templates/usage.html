@@ -1,120 +1,22 @@
 {% extends "base.html" %}
-{% load abTest %}
+
 {% block content %}
     <div class="row well">
         <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
             <li class=""><a href="#setup" data-toggle="tab">Setup</a></li>
-            <li class="active"><a href="#model" data-toggle="tab">Model</a></li>
-            <li><a href="#test" data-toggle="tab">View</a></li>
-            <li><a href="#testResult" data-toggle="tab">Template</a></li>
-            <li><a href="#testResult" data-toggle="tab">Development</a></li>
+            <li class=""><a href="#model" data-toggle="tab">Model</a></li>
+            <li class=""><a href="#view" data-toggle="tab">View</a></li>
+            <li class=""><a href="#template" data-toggle="tab">Template</a></li>
+            <li class=""><a href="#settings" data-toggle="tab">Settings</a></li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane" id="setup">
-                <p>For normal use these steps are required:</p>
-                <ul>
-                    <li>Add <code>abTest</code> to <code>INSTALLED_APPS</code>.</li>
-                    <li>Add <code>abTest.middleware.RequestMiddleware</code> to <code>MIDDLEWARE_CLASSES</code>.</li>
-                    <li>Add <code>abTest.context_processor.ab</code> to <code>TEMPLATE_CONTEXT_PROCESSORS</code></li>
-                </ul>
-                <p>Do not forget to run <code>./manage.py syncdb</code>.</p>
-                <pre>
-INSTALLED_APPS = (
-    ...
-    'abTest',
-    ...
-)
-
-MIDDLEWARE_CLASSES = (
-    ...
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'abTest.middleware.RequestMiddleware', # <- It is VERY important to put abTest AFTER SessionMiddleware
-    ...
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-    # Stuff above is default, if TEMPLATE_CONTEXT_PROCESSORS is not set.
-
-    "abTest.context_processors.ab",
-)
-                </pre>
-            </div>
-            <div class="tab-pane active" id="model">
-                <p>
-                    AbTest framework use a simple object model. The classes are:
-                    <ul>
-                        <li>Test</li>
-                        <li>Goal</li>
-                        <li>Experiment</li>
-                        <li>TestResult</li>
-                    </ul>
-                </p>
-
-                <div class="alert-info">
-                    <p>
-                        It is VERY recommended to use only those names, that would be valid python function names (no spaces for example).
-                        There are no validators, so every name is fine for the framework; but you might loose the conveniences from
-                        some helper, that provides magic function names (based on names of the models).
-                    </p>
-                </div>
-                <p>For example: if you name your test <code>differentBackgroundColors</code>, you can check the active
-                    experiment in your template very easy via
-                    <code>{% templatetag openvariable %}ab.differentBackgroundColors{% templatetag closevariable %}</code>.
-                    In case of <code>different background colors</code>, this would not work. You can still get all
-                    information, but this leads to more complex templates (for this example you could use the <code>getExperiment</code>
-                    template tag (see templates)).
-                </p>
-                <h3>Creating models</h3>
-                <p>
-                    You can use the <a href="{% url 'admin:index' %}">admin</a> to create Tests, Goals and Experiments. TestResults
-                    are created and managed by the framework.
-                </p>
-                <p>Model creation contains no magic. Feel free to use your db shell, or python code:
-                    <pre>
-from abTest.models import Test, Goal, Experiment
-test = Test.objects.create(name = "background", active = True)
-test.goals.add(Goal.objects.create(name = "buttonPressed"))
-test.experiments.add(Experiment.objects.create(name="red"))
-test.experiments.add(Experiment.objects.create(name="blue"))
-test.experiments.add(Experiment.objects.create(name="green"))
-                    </pre>
-                </p>
-                <h3>Goal</h3>
-                <p>
-                    A goal is something you want to reach - selling something, newsletter subscription, clicking to a link,
-                    open a page, whatever you want...
-                </p>
-                <p>
-                    To tell the framework that a goal was reached, you need to call the <code>reached</code> method on the
-                    goal instance. It updates the TestResult for current session and marks the goal as reached for all
-                    relevant tests.
-                    <pre>
-from abTest.models import Goal
-def subscribedToNewsletter(request):
-    goal = Goal.objects.get(name = 'subscribedNewsletter')
-    goal.reached(request)
-                    </pre>
-                    <p>If you do not have an instance of the goal (like in the example above), you may use this little helper,
-                    that accepts a string:
-                        <pre>
-from abTest import goalReached
-def subscribedToNewsletter(request):
-    goalReached(request, 'subscribedNewsletter')
-                        </pre>
-                    </p>
-                </p>
-                <h3>Experiment</h3>
-                <p>
-
-                </p>
-            </div>
+            <div class="tab-pane active" id="info">{% include "usage/info.html" %}</div>
+            <div class="tab-pane" id="setup">{% include "usage/setup.html" %}</div>
+            <div class="tab-pane" id="model">{% include "usage/model.html" %}</div>
+            <div class="tab-pane" id="view">{% include "usage/view.html" %}</div>
+            <div class="tab-pane" id="template">{% include "usage/template.html" %}</div>
+            <div class="tab-pane" id="settings">{% include "usage/settings.html" %}</div>
         </div>
 
     </div>

@@ -1,10 +1,11 @@
 from logging import getLogger
-from models import Goal, Experiment
+from models import Goal, Experiment, Test
 
 from django.conf import settings
 from django.shortcuts import render_to_response
+from abTest.settings import AB_TEST_REQUEST_NAME, AB_TEST_LOGGER
 
-logger = getLogger(getattr(settings, 'AB_TEST_LOGGER',"abTest"))
+logger = getLogger(AB_TEST_LOGGER)
 
 def render_to_ab_response(abTest, templates, dictionary=None, defaultTemplate = None, context_instance=None):
     targetTemplate = defaultTemplate
@@ -14,7 +15,7 @@ def render_to_ab_response(abTest, templates, dictionary=None, defaultTemplate = 
             break
     return render_to_response(targetTemplate, dictionary, context_instance = context_instance)
 
-def goalReached(request, name, commit = True, failSilent=None):
+def reachedGoal(request, name, commit = True, failSilent=None):
     #noinspection PyBroadException
     if failSilent is None:
         failSilent = not getattr(settings,'DEBUG', True)
@@ -27,9 +28,22 @@ def goalReached(request, name, commit = True, failSilent=None):
             raise
         return []
 
-def setExperiment(request, name):
-    experiment = Experiment.objects.get(name=name)
-    for test, result in request.abTest.items():
-        if experiment in test.experiments.all():
-            result.experiment = experiment
-            result.save()
+def goalReached(request, name, commit = True, failSilent=None):
+    """
+    deprecated: use reachedGoal instead
+    """
+    return reachedGoal(request, name, commit, failSilent)
+
+def setExperiment(request, test, experiment):
+    if not isinstance(test, Test):
+        test = Test.objects.get(name = test)
+    if not isinstance(experiment, Experiment):
+        experiment = Experiment.objects.get(name = experiment)
+
+    for currentTest, currentResult in getattr(request, AB_TEST_REQUEST_NAME, {}).items():
+        if not currentTest == test: continue
+        if experiment in currentTest.experiments.all():
+            currentResult.experiment = experiment
+            currentResult.save()
+            logger.debug("set experiment for test [%s] to: [%s]", test, experiment)
+            break

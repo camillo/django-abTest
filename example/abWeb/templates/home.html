@@ -9,13 +9,6 @@
     </div>
     <div class="row">
         <div class="span3">
-            <h2>Model</h2>
-            <p>We have goals, tests, experiments and results.</p>
-            <a href="{% url 'models' %}" class="btn btn-primary pull-right">
-                more
-            </a>
-        </div>
-        <div class="span3">
             <h2>Usage</h2>
             <p>See, what components can help you with your tests.</p>
             <a href="{% url 'usage' %}" class="btn btn-primary pull-right">
@@ -29,34 +22,6 @@
                 more
             </a>
         </div>
-    <div class="row">
-        <div class="span9">
-            <h2>Implementation</h2>
-            <p>
-                I think we can divide implementations into two groups:
-                <ol>
-                    <li>switches in templates
-                        <p>
-                            Changes for tests are implemented in the 'live' template. Obviously the template needs to know
-                            about the current one, to render the correct experiment. Advantage of this method is fast implementation
-                            and you have everything at one place; but it can become unhandy when you need to change large parts of the site.
-                            And you should implement default handlers for your switches, if tests become inactive and
-                            experiments are not longer provided to the template.
-                        </p>
-                    </li>
-                    <li>one template per experiment
-                        <p>You do not touch your live templates, but create a new (probably derived) template per Experiment
-                            (or one new, containing switches for all experiments). In this scenario the view needs to
-                            know about the current active experiments.
-                        </p>
-                    </li>
-                </ol>
-                The lib allows you to mix both methods as you like, by shipping a middleware that choose and store experiments
-                per session. They are available in request.abTest; together with a context processor, that make these
-                information available to templates.
-            </p>
-        </div>
-    </div>
     </div>
 
 {% endblock %}

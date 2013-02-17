@@ -1,22 +1,24 @@
 {% extends "base.html" %}
-
+{% load abTest %}
 {% block extraCss %}
-    .abBackground-green {
-        background: green;
-    }
-    .abBackground-red {
-    background: red;
-    }
-    .abBackground-blue {
-    background: blue;
-    }
+    <style TYPE="text/css">
+        .abBackground-green {
+            background: green;
+        }
+        .abBackground-red {
+        background: red;
+        }
+        .abBackground-blue {
+        background: blue;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="span7 abBackground-{{ ab.background }}">
             <p>Please... press the button. It costs nealy nothing and is everything you ever wanted.</p>
-            <form method="get" action="{% url 'spendMoney' %}">
+            <form method="get" action="{% reachedGoalUrl 'buttonPressed' %}">
                 <button type="submit" class="btn btn-inverse">buy</button>
 
             </form>
@@ -59,144 +61,9 @@
                 <li><a href="#debug" data-toggle="tab">Debug</a></li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane active" id="about">
-                    <p>
-                        On this side, we want the user to buy something on div above, by pressing the button.
-                    </p>
-                    <p>
-                        We try three experiments with different background colors. Your session is chosen to try [{{ ab.background }}].
-                        Check for yourself that this will not change by refreshing the browser.
-                    </p>
-                    <p> Feel free to press the button, or  <a href="{% url 'abTest:clear' %}">clear</a> the session to create a new test run.</p>
-                    <p>See success of our experiments on stats to the right. Note, that the same goal cannot reached twice. Pressing the buy
-                    button will effect stats only once per session.</p>
-                    <p>Check Inside tab for implementation details.</p>
-                </div>
-                <div class="tab-pane" id="inside">
-                    <p>In django's admin, a test named <code>background</code> was created. We added three experiments
-                    <code>red blue green</code>, together with new goal <code>buttonPressed</code>.
-                    </p>
-                    <p>Three classes with css got introduced, to prepare the test:</p>
-                    <pre>
-.abBackground-green {
-    background: green;
-}
-.abBackground-red {
-    background: red;
-}
-.abBackground-blue {
-    background: blue;
-}
-                    </pre>
-
-                    <p>The correct class is set inside the template via:
-                    <code>
-                        &lt;div class="abBackground-{% templatetag openvariable %} ab.background {% templatetag closevariable %}">
-                    </code></p>
-                    <p>Dictionary 'ab' in context, holds current experiment's name for every active test.
-                    This is done by abTest's context processor. Obviously it must be registerd in settings.py:</p>
-                    <pre>
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-
-    # Stuff above is default, if TEMPLATE_CONTEXT_PROCESSORS is not set.
-    "abTest.context_processors.ab",
-    )
-
-                    </pre>
-                    <p>The work behind the scenes
-                        <ul>
-                            <li>choose experiments for new sessions</li>
-                            <li>create new TestResult for every session</li>
-                            <li>save these information in session</li>
-                            <li>put abTest object into every request (where context processor and everyone else can
-                            use it)</li>
-                        </ul>
-                        is done in abTest's middleware:
-                    </p>
-                    <pre>
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-
-    # It is VERY important to put abTest AFTER SessionMiddleware
-    'abTest.middleware.RequestMiddleware',
-}
-                    </pre>
-                    <p>
-                        abTest itself needs to be registered in INSTALLED_APPS:
-                        <pre>
-INSTALLED_APPS = (
-    'abTest',
-)
-                        </pre>
-                    </p>
-                    <p>Last missing thing: We need to tell the abTest framework about pressed buttons (reached goals).
-                        Here, it is done inside the view, that handles the button click:
-                    </p>
-                    <pre>
-from abTest import goalReached
-def reachedGoalButton(request):
-    goalReached(request, "buttonPressed")
-    success(request, "thx for your money...")
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-                    </pre>
-                </div>
-
-                <div class="tab-pane" id="debug">
-                    <p>On this page, we use abTest debug features to change current experiments. They are called 'debug'
-                        features because they are designed to help you during development and debug; feel totally free to use
-                        them live.</p>
-                    <p>abTest brings some debug views. Add an import in your urls.py, to activate them:</p>
-                    <pre>
-from abTest import urls as abTestUrls
-urlpatterns = patterns('',
-    ...
-    url(r'^abTest/', include(abTestUrls, namespace="abTest")),
-)
-                    </pre>
-                    <p>If you want to use an other namespace, you need to override template
-                        <code>abTest/sessionAdmin.html</code> and set it there, if you want
-                        to use the sessionAdmin.
-                    </p>
-                    <h4>abTest:setExperiment, args = ['exampleName',]</h4>
-                    <p>set experiment with given name for current session. We use this here, to provide links
-                        for the red, green, blue buttons:
-                        <pre>
-{% templatetag openblock %} for experiment in ab.background.experiments {% templatetag closeblock %}
-    &lt;div class="span1"&gt;
-        &lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' experiment.name {% templatetag closeblock %}"
-            style="color: {% templatetag openvariable %} experiment {% templatetag closevariable %};" class="btn"&gt;
-            {% templatetag openvariable %} experiment {% templatetag closevariable %}&lt;/a&gt;
-    &lt;/div&gt;
-{% templatetag openblock %} endfor {% templatetag closeblock %}
-                        </pre>
-                    </p>
-                    <h4>abTest:clear</h4>
-                    <p>Stop all tests, clear session and request. Next request will create a new test session with random experiments.
-                        <code>&lt;a href="{% templatetag openblock %} url 'abTest:clear'{% templatetag closeblock %}"&gt;clear&lt;/a&gt;</code> -
-                        This call only affects caller's session.
-                    </p>
-                    <p>
-                        <code>setExperiment</code> and <code>clear</code> accepts a next parameter (post or get) to redirect to after execution.
-                        If not given, settings will be checked, then HTTP_REFERER; fallback is '/'
-                    </p>
-                    <p>
-                        In case of ajax calls, methods simple return HttpResponse('ok')
-                    </p>
-                    <h4>abTest:sessionAdmin</h4>
-                    <p>Show the generic session admin page. It shows all active tests with their experiments and let
-                        you activate single ones. Simple link to the view, if you want to use it:
-                        <pre>
-See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% templatetag closeblock %}"&gt;here.&lt;/a&gt;
-                        </pre>
-                    </p>
-                </div>
+                <div class="tab-pane active" id="about">{% include "liveDemo/about.html" %}</div>
+                <div class="tab-pane" id="inside">{% include "liveDemo/inside.html" %}</div>
+                <div class="tab-pane" id="debug">{% include "liveDemo/debug.html" %}</div>
 
             </div>
         </div>
@@ -205,7 +72,7 @@ See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% temp
                 This feature is designed for development and debug. Feel free to use it live, if you see any needs.</p>
             <div class="row">
                 {% for experiment in ab.background.experiments %}
-                    <div class="span1"><a href="{% url 'abTest:setExperiment' experiment.name %}" style="color: {{ experiment }};" class="btn">{{ experiment }}</a></div>
+                    <div class="span1"><a href="{% url 'abTest:setExperiment' 'background' experiment.name %}" style="color: {{ experiment }};" class="btn">{{ experiment }}</a></div>
                 {% endfor %}
                 <div class="span1"><a href="{% url 'abTest:clear' %}" class="btn">clear</a></div>
             </div>
@@ -214,7 +81,7 @@ See it &lt;a href="{% templatetag openblock %} url 'abTest:sessionAdmin' {% temp
             </div></div>
             <div style="display:none;" class="row"><div class="span4">
                 <p>to get the url for experiment setter, use something like this in your template:
-                    <code>{% templatetag openblock %} url 'abTest:setExperiment' 'red' {% templatetag closeblock %}</code></p>
+                    <code>{% templatetag openblock %} url 'abTest:setExperiment' 'background' 'red' {% templatetag closeblock %}</code></p>
             </div></div>
         </div>
     </div>

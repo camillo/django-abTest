@@ -1,0 +1,71 @@
+
+
+    <h3 xmlns="http://www.w3.org/1999/html">Accessing current tests and experiments</h3>
+    <p>
+        If you added the context processor (see setup), find object <code>ab</code> inside your context. It holds current
+        experiment per test and can easy queried like this:
+        <pre>
+{% templatetag openblock %} if ab.background == "green" {% templatetag closeblock %}
+    ...
+{% templatetag openblock %} endif {% templatetag closeblock %}
+        </pre>
+    </p>
+    <p>
+        This will not work, if you have spaces (or other special chars) inside your test's name. In this case, you might
+        find templatetag <code>getExperiment</code> useful:
+        <pre>
+{% templatetag openblock %} load abTest {% templatetag closeblock %}
+{% templatetag openblock %} getExperiment "background color" as backgroundColor {% templatetag closeblock %}
+{% templatetag openblock %} if backgroundColor == "blue" {% templatetag closeblock %}
+    ...
+{% templatetag openblock %} endif {% templatetag closeblock %}
+        </pre>
+    </p>
+    <h3>Reaching goals</h3>
+    <p>
+        Normal use case is to call <code>goal.reached(request)</code> inside a view. If you do not want to change any
+        peace of your code and do all abTest related things inside templates, you can use provided view <code>reachedGoal</code>.
+        If you followed recommendation and imported <code>abTest</code> namespace in settings (see Setup tab),
+        you may use following template tag, to get the url for reaching a goal:
+        <pre>
+{% templatetag openblock %}load abTest{% templatetag closeblock %}
+{% templatetag openblock %} reachedGoalUrl 'buttonPressed' {% templatetag closeblock %}
+        </pre>
+        You may link to the url, or call it via ajax. In case of ajax, view simple returns 'ok'; otherwise it redirects
+        to one of the following locations (first wins):
+        <ul>
+            <li><code>next</code> parameter in POST or GET</li>
+            <li>setting AB_TEST_REDIRECT_AFTER_REACHED_GOAL</li>
+            <li>HTTP_REFERER</li>
+            <li>setting AB_TEST_REDIRECT_AFTER_DEFAULT</li>
+            <li>/</li>
+        </ul>
+        Warning: Obviously one could manipulate your stats by simple calling these 'success' links, if they are known.
+        In most cases this is not an issue, because existens of AB-Test are not known to users.
+        <p class=alert-danger>
+        If you choose to use this view, make sure to put <code>Disallow: /abTest/</code> into your robots.txt; we do not
+        want bots to call and indices them. If you provide a sitemap.xml, make sure abTest view's urls are not listed for
+        same reason.
+        </p>
+    </p>
+    <h3>Setting active experiments</h3>
+    <p>During debug and development you will find it useful to set the active experiment for a test.</p>
+    <p>If you use django's admin, there is probably no need to change experiments with templates. Simple navigate to
+        /admin/abTest and set the experiment for current session there.
+    </p>
+    <p>
+        If you cannot or do not want to use django's admin, there is a standalone session admin page.
+        If you imported the abTest namespace in urls.py, find it at <code>/abTest/sessionAdmin</code>. In case of <code>DEBUG = True</code>, the site is open for everyone;
+        otherwise only staff is allowed to enter it. You may change this behaviour with setting <code>AB_TEST_DEBUG_VIEWS_RESTRICTIONS</code>.
+        As you can see in the live demo, it is also possible to call debug urls, to set an experiment for a test:
+        <pre>
+&lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' 'background' 'red' {% templatetag closeblock %}"&gt;
+        </pre>
+        <code>background</code> and <code>red</code> are values of the SLUG field; not the name.
+        If you do not use special chars, this will be the same, but if you have instances use slug:
+        <pre>
+&lt;a href="{% templatetag openblock %} url 'abTest:setExperiment' background.slug experiment.slug {% templatetag closeblock %}"&gt;
+        </pre>
+        Behaviour for ajax and redirection are same as for reachedGoalUrl, except that setting
+        <code>AB_TEST_REDIRECT_AFTER_SET_EXPERIMENT</code> will be used.
+    </p>

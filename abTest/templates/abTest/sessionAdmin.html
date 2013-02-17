@@ -18,7 +18,7 @@
                                     <span class="activeLabel">(active)</span>
                                 {% else %}
                                     <a {% if not experiment.active %}title="WARNING: You set an experiment, that is marked as deactivated. Your choice." {% endif %}
-                                            href="{% url 'abTest:setExperiment' experiment.name %}" class="experimentSetter">set</a>
+                                            href="{% url 'abTest:setExperiment' test.raw.slug experiment.slug %}" class="experimentSetter">set</a>
                                 {% endif %}
                             </li>
                         {% endfor %}
