@@ -77,7 +77,13 @@
                 <div class="span1"><a href="{% url 'abTest:clear' %}" class="btn">clear</a></div>
             </div>
             <div class="row"><div class="span4">
-                <p>abTest framework ships with a generic session admin to help you during development. See it <a href="{% url 'abTest:sessionAdmin' %}">here</a>.</p>
+                <p>
+                    abTest framework ships with a generic session admin to help you during development. See it <a href="{% url 'abTest:sessionAdmin' %}">here</a>.
+                </p>
+                <p>
+                    Note: Per default settings, the site can be seen with DEBUG=True or from staff members. For public hosting
+                    we set <code>AB_TEST_DEBUG_VIEWS_RESTRICTIONS = ('all',)</code>. This is why you can visit the site.
+                </p>
             </div></div>
             <div style="display:none;" class="row"><div class="span4">
                 <p>to get the url for experiment setter, use something like this in your template:
