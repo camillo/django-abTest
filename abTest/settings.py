@@ -8,7 +8,7 @@ AB_TEST_ACTIVE = getattr(settings, 'AB_TEST_ACTIVE', True)
 # Per default, middleware choose randomly one experiment; you may define your own function here.
 # You may return any Experiment from the test, but it is recommended to not return inactive experiments.
 AB_TEST_EXPERIMENT_CHOOSER = getattr(settings, 'AB_TEST_EXPERIMENT_CHOOSER',
-    lambda request, test: choice(test.experiments.filter(active=True)))
+                                     lambda request, test: choice(test.experiments.filter(active=True)))
 
 # If set to True, abTest framework will not raise exceptions (they are still logged).
 # Per default, exceptions will be eaten in live deployment (ab testing should not break your side),
@@ -50,7 +50,7 @@ AB_TEST_SESSION_ADMIN_TEMPLATE = getattr(settings, 'AB_TEST_REDIRECT_AFTER_CLEAR
 # 5. a callable (lambda expression, for example), that accepts a user and returns True or False.
 #
 # Default is ('debug', 'staff')
-AB_TEST_DEBUG_VIEWS_RESTRICTIONS = getattr(settings, 'AB_TEST_DEBUG_VIEWS_RESTRICTIONS', ('debug','staff'))
+AB_TEST_DEBUG_VIEWS_RESTRICTIONS = getattr(settings, 'AB_TEST_DEBUG_VIEWS_RESTRICTIONS', ('debug', 'staff'))
 
 # You may define the used logger here
 AB_TEST_LOGGER = getattr(settings, 'AB_TEST_LOGGER', 'abTest')
